@@ -5,12 +5,19 @@ import { apiClient } from './client'
 import { matchText, mockPage } from './helpers'
 import { delay } from '../mocks/delay'
 
-export async function searchRegulatoryItems(params: ListParams = {}): Promise<PagedResponse<RegulatoryItem>> {
-  if (!env.useMock) return (await apiClient.get<PagedResponse<RegulatoryItem>>('/regulatory-items', { params })).data
-  const rows = regulatoryItems.filter((item) =>
-    (!params.country || item.country === params.country) && (!params.category || item.category === params.category) &&
-    (!params.industry || item.industry === params.industry) && (!params.businessArea || item.businessArea === params.businessArea) &&
-    (!params.q || matchText(`${item.title} ${item.summary} ${item.source}`, params.q)),
+export async function searchRegulatoryItems(
+  params: ListParams = {},
+): Promise<PagedResponse<RegulatoryItem>> {
+  if (!env.useMock)
+    return (await apiClient.get<PagedResponse<RegulatoryItem>>('/regulatory-items', { params }))
+      .data
+  const rows = regulatoryItems.filter(
+    (item) =>
+      (!params.country || item.country === params.country) &&
+      (!params.category || item.category === params.category) &&
+      (!params.industry || item.industry === params.industry) &&
+      (!params.businessArea || item.businessArea === params.businessArea) &&
+      (!params.q || matchText(`${item.title} ${item.summary} ${item.source}`, params.q)),
   )
   return mockPage(rows, params)
 }
@@ -22,7 +29,9 @@ export async function getRegulatoryItem(id: string): Promise<RegulatoryItem | un
 }
 
 export async function toggleBookmark(id: string, userId = 'demo'): Promise<boolean> {
-  if (!env.useMock) return (await apiClient.post<{ bookmarked: boolean }>(`/regulatory-items/${id}/bookmark`)).data.bookmarked
+  if (!env.useMock)
+    return (await apiClient.post<{ bookmarked: boolean }>(`/regulatory-items/${id}/bookmark`)).data
+      .bookmarked
   await delay()
   const userBookmarks = bookmarks.get(userId) ?? new Set<string>()
   if (userBookmarks.has(id)) userBookmarks.delete(id)
@@ -31,19 +40,35 @@ export async function toggleBookmark(id: string, userId = 'demo'): Promise<boole
   return userBookmarks.has(id)
 }
 
-export async function reviewRegulatoryItem(id: string, decision: 'Approved' | 'Rejected', comment: string): Promise<RegulatoryItem> {
-  if (!env.useMock) return (await apiClient.post<RegulatoryItem>(`/regulatory-items/${id}/review`, { decision, comment })).data
+export async function reviewRegulatoryItem(
+  id: string,
+  decision: 'Approved' | 'Rejected',
+  comment: string,
+): Promise<RegulatoryItem> {
+  if (!env.useMock)
+    return (
+      await apiClient.post<RegulatoryItem>(`/regulatory-items/${id}/review`, { decision, comment })
+    ).data
   await delay()
   const item = regulatoryItems.find((record) => record.id === id)
   if (!item) throw new Error('Regulatory item not found')
   item.reviewStatus = 'REVIEWED'
-  item.reviewer = 'admin@vistar.demo'
-  auditLog.unshift({ id: `AUD-${Date.now()}`, timestamp: new Date().toISOString(), userEmail: 'admin@vistar.demo', role: 'ADMIN', action: `${decision}: ${comment}`, entityType: 'REGULATORY_ITEM', entityId: id })
+  item.reviewer = 'admin@pharmatool.demo'
+  auditLog.unshift({
+    id: `AUD-${Date.now()}`,
+    timestamp: new Date().toISOString(),
+    userEmail: 'admin@pharmatool.demo',
+    role: 'ADMIN',
+    action: `${decision}: ${comment}`,
+    entityType: 'REGULATORY_ITEM',
+    entityId: id,
+  })
   return item
 }
 
 export async function getRegulatoryActivity(id: string): Promise<AuditEntry[]> {
-  if (!env.useMock) return (await apiClient.get<AuditEntry[]>(`/regulatory-items/${id}/activity`)).data
+  if (!env.useMock)
+    return (await apiClient.get<AuditEntry[]>(`/regulatory-items/${id}/activity`)).data
   await delay()
   return auditLog.filter((entry) => entry.entityId === id)
 }

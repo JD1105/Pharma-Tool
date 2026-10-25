@@ -1,6 +1,6 @@
-# Vistar Tool: Frontend Specification
+# Pharma Tool: Frontend Specification
 
-> **Purpose:** This file is the single source of truth for building the Vistar frontend prototype.
+> **Purpose:** This file is the single source of truth for building the Pharma Tool frontend prototype.
 > Give it to GitHub Copilot (Agent mode) and build it **step by step in the order of Section 14**.
 > **Scope:** Frontend only. The backend (Java Spring Boot) comes later, so this frontend must run fully on **mock data** and switch to the real API with one environment variable.
 > **Time budget:** about 4 hours. Keep it simple, clean and professional. Do not over-engineer.
@@ -9,7 +9,7 @@
 
 ## 1. Product Overview
 
-Vistar is a **regulatory intelligence platform for the pharma industry**. Users search, compare and track regulatory information (guidances, regulations, news, associations, ingredient data, country updates), manage regulatory projects, and upload documents.
+Pharma Tool is a **regulatory intelligence platform for the pharma industry**. Users search, compare and track regulatory information (guidances, regulations, news, associations, dietary supplement data, country updates), manage regulatory projects, and upload documents.
 
 **Users:** Admin, Tool Developer, Client, and Temporary (time-limited) users.
 
@@ -19,123 +19,55 @@ Vistar is a **regulatory intelligence platform for the pharma industry**. Users 
 
 ## 2. Tech Stack (Frontend)
 
-| Concern | Choice |
-|---|---|
-| Framework | React 18 + **TypeScript** |
-| Build tool | Vite |
-| UI library | **MUI (Material UI) v5/v6** with a custom theme |
-| Routing | React Router v6 |
-| Server state | TanStack Query (React Query) |
-| HTTP | Axios (with interceptors) |
-| Forms | React Hook Form + Zod |
-| Tables | MUI DataGrid (community edition) |
-| Charts | Recharts |
-| Icons | `@mui/icons-material` |
-| Linting | ESLint + Prettier |
-| Hosting | **Vercel** (SPA) |
-
-**Install command (reference):**
-```bash
-npm create vite@latest . -- --template react-ts
-npm i @mui/material @mui/icons-material @mui/x-data-grid @emotion/react @emotion/styled
-npm i react-router-dom @tanstack/react-query axios react-hook-form zod @hookform/resolvers recharts dayjs
-```
-
----
+| Concern      | Choice                 |
+| ------------ | ---------------------- |
+| Framework    | React 18 + TypeScript  |
+| Build tool   | Vite                   |
+| UI library   | MUI v6                 |
+| Routing      | React Router v6        |
+| Server state | TanStack Query         |
+| HTTP         | Axios                  |
+| Forms        | React Hook Form + Zod  |
+| Tables       | MUI DataGrid Community |
+| Charts       | Recharts               |
+| Hosting      | Vercel (SPA)           |
 
 ## 3. Folder Structure
 
-All files live inside `tool-frontend/`.
-
-```
 tool-frontend/
-├── .github/
-│   └── copilot-instructions.md
-├── public/
-│   └── favicon.svg
+├── .github/copilot-instructions.md
+├── public/favicon.svg
 ├── src/
-│   ├── main.tsx
-│   ├── App.tsx
-│   ├── theme/
-│   │   └── theme.ts
-│   ├── config/
-│   │   ├── env.ts                 # reads VITE_* variables
-│   │   ├── menu.ts                # role -> menu items config
-│   │   └── permissions.ts         # role -> permission map
-│   ├── types/
-│   │   └── index.ts               # shared TypeScript types
-│   ├── auth/
-│   │   ├── AuthContext.tsx
-│   │   ├── useAuth.ts
-│   │   ├── ProtectedRoute.tsx
-│   │   └── RoleGuard.tsx
-│   ├── api/
-│   │   ├── client.ts              # axios instance + interceptors
-│   │   ├── authApi.ts
-│   │   ├── ingredientApi.ts
-│   │   ├── regulatoryApi.ts       # used by Summarize, HUNT, Dashboard
-│   │   ├── documentApi.ts
-│   │   ├── countryUpdateApi.ts
-│   │   ├── projectApi.ts
-│   │   ├── userApi.ts             # admin user management
-│   │   └── auditApi.ts
-│   ├── mocks/
-│   │   ├── db.ts                  # in-memory mock data store
-│   │   ├── ingredients.ts
-│   │   ├── regulatoryItems.ts
-│   │   ├── countryUpdates.ts
-│   │   ├── projects.ts
-│   │   ├── users.ts
-│   │   └── delay.ts               # simulates network latency
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── AppLayout.tsx
-│   │   │   ├── Sidebar.tsx
-│   │   │   ├── Topbar.tsx
-│   │   │   └── PageHeader.tsx
-│   │   ├── common/
-│   │   │   ├── FilterBar.tsx
-│   │   │   ├── DataTable.tsx
-│   │   │   ├── ResultActions.tsx  # download / bookmark / share
-│   │   │   ├── CompareDialog.tsx
-│   │   │   ├── StatusChip.tsx
-│   │   │   ├── ConfirmDialog.tsx
-│   │   │   ├── EmptyState.tsx
-│   │   │   ├── ErrorState.tsx
-│   │   │   ├── LoadingState.tsx
-│   │   │   └── PrototypeBanner.tsx
-│   │   └── feedback/
-│   │       └── Toast.tsx
-│   ├── pages/
-│   │   ├── LoginPage.tsx
-│   │   ├── NotFoundPage.tsx
-│   │   ├── ForbiddenPage.tsx
-│   │   ├── summarize/SummarizePage.tsx
-│   │   ├── ingredients/IngredientPage.tsx
-│   │   ├── hunt/HuntPage.tsx
-│   │   ├── ri-operations/
-│   │   │   ├── ImpactAssessmentPage.tsx
-│   │   │   ├── WatchlistPage.tsx
-│   │   │   ├── ProjectsPage.tsx    # tabs: Dashboard / Projects / Tasks
-│   │   │   └── RiDocumentsPage.tsx
-│   │   ├── summarize-dashboard/SummarizeDashboardPage.tsx
-│   │   ├── document-upload/DocumentUploadPage.tsx
-│   │   ├── country-updates/CountryUpdatesPage.tsx
-│   │   ├── cmc/CmcDashboardPage.tsx
-│   │   └── admin/
-│   │       ├── UserManagementPage.tsx
-│   │       └── AuditLogPage.tsx
-│   ├── hooks/
-│   │   ├── useDebounce.ts
-│   │   └── useToast.ts
-│   ├── utils/
-│   │   ├── format.ts
-│   │   └── download.ts
-│   └── routes/
-│       └── AppRoutes.tsx
+│ ├── api/ (authApi, dietarySupplementApi, regulatoryApi, documentApi, countryUpdateApi, projectApi, userApi, auditApi)
+│ ├── auth/ (AuthContext, useAuth, ProtectedRoute, RoleGuard)
+│ ├── components/ (common, feedback, layout)
+│ ├── config/ (env, menu, permissions)
+│ ├── hooks/ (useDebounce, useToast)
+│ ├── mocks/ (db, dietarySupplements, delay)
+│ ├── pages/
+│ │ ├── admin/
+│ │ ├── cmc/
+│ │ ├── country-updates/
+│ │ ├── dietary-supplements/DietarySupplementsPage.tsx
+│ │ ├── documents/DocumentsPage.tsx
+│ │ ├── document-upload/
+│ │ ├── operations/ (ImpactAssessmentPage, WatchlistPage, ProjectsPage, ProjectDocumentsPage)
+│ │ ├── summaries/SummariesPage.tsx
+│ │ └── summaries-dashboard/SummariesDashboardPage.tsx
+│ ├── theme/theme.ts
+│ ├── types/index.ts
+│ └── utils/download.ts
+├── .env.example
+├── index.html
+├── package.json
+├── vercel.json
+└── README.md
+│ │ └── useToast.ts
+│ ├── utils/
+│ │ └── download.ts
+│ └── feedback/Toast.tsx
 ├── .env.example
 ├── .env.development
-├── .eslintrc.cjs
 ├── .prettierrc
 ├── index.html
 ├── package.json
@@ -143,6 +75,7 @@ tool-frontend/
 ├── vite.config.ts
 ├── vercel.json
 └── README.md
+
 ```
 
 ---
@@ -151,10 +84,12 @@ tool-frontend/
 
 `.env.example`
 ```
+
 VITE_API_URL=http://localhost:8080/api/v1
 VITE_USE_MOCK=true
-VITE_APP_NAME=Vistar
-```
+VITE_APP_NAME=Pharma Tool
+
+````
 
 - `VITE_USE_MOCK=true`: every `api/*.ts` file returns data from `src/mocks`.
 - `VITE_USE_MOCK=false`: every `api/*.ts` file calls the real backend via Axios.
@@ -174,22 +109,16 @@ Create `src/theme/theme.ts` with the MUI `createTheme`.
 | Secondary / accent | `#0E9AA7` (teal) |
 | Success | `#2E7D32` |
 | Warning | `#ED6C02` |
-| Error | `#D32F2F` |
 | Background | `#F4F6F9` |
 | Paper | `#FFFFFF` |
 | Text primary | `#1B2733` |
 | Font | `Inter`, fallback `Roboto, Arial, sans-serif` |
 | Border radius | `8px` |
-
-**Rules**
-- Light theme only (dark mode is out of scope).
 - Cards use a 1px border `#E3E8EF` and almost no shadow.
 - Table headers use a light grey background and bold text.
 - Buttons: no uppercase text transform. Primary actions are contained, secondary are outlined.
-- Spacing: use the MUI 8px grid consistently.
-- Page layout: fixed left sidebar (260px), a top bar (64px), and a content area with `max-width: 1400px`.
 
----
+6. **Dietary Supplements** (search, filters, compare, reports).
 
 ## 6. Roles and Access Matrix
 
@@ -197,11 +126,11 @@ Roles: `ADMIN`, `DEVELOPER`, `CLIENT`, `TEMP`.
 
 | Module / Route | ADMIN | DEVELOPER | CLIENT | TEMP |
 |---|:---:|:---:|:---:|:---:|
-| Summarize | ✅ | ✅ | ✅ | ✅ (read-only) |
-| Ingredient DB | ✅ | ✅ | ✅ | ✅ (read-only) |
-| HUNT | ✅ | ✅ | ✅ | ✅ (no bookmark/share) |
-| RI Operations | ✅ | ✅ | ✅ | ❌ |
-| Summarize Dashboard | ✅ | ✅ | ✅ (View, View Activity) | ❌ |
+| Summaries | ✅ | ✅ | ✅ | ✅ (read-only) |
+| Dietary Supplements | ✅ | ✅ | ✅ | ✅ (read-only) |
+| Documents | ✅ | ✅ | ✅ | ✅ (no bookmark/share) |
+| Operations | ✅ | ✅ | ✅ | ❌ |
+| Summaries Dashboard | ✅ | ✅ | ✅ (View, View Activity) | ❌ |
 | Review action | ✅ | ✅ | ✅ | ❌ |
 | Document Upload | ✅ | ✅ | ✅ | ❌ |
 | Country Updates | ✅ | ✅ | ✅ | ✅ (read-only) |
@@ -222,7 +151,7 @@ Implement in `config/permissions.ts` as a permission map (for example `"document
 
 ## 7. Authentication (Frontend)
 
-- `LoginPage`: email and password form with validation (Zod), a loading state, and error messages. Centered card layout with the Vistar logo/name and a short tagline.
+- `LoginPage`: email and password form with validation (Zod), a loading state, and error messages. Centered card layout with the Pharma Tool logo/name and a short tagline.
 - `AuthContext` holds `user` (`id, name, email, role, tenant, validUntil`), `token`, `login()`, `logout()`, `isAuthenticated`.
 - **Token storage (prototype):** keep in memory and mirror to `sessionStorage`, so a refresh keeps the session but closing the tab clears it. Add a comment in the code that production should use `httpOnly` secure cookies.
 - Axios request interceptor adds `Authorization: Bearer <token>`.
@@ -235,12 +164,12 @@ Implement in `config/permissions.ts` as a permission map (for example `"document
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | admin@vistar.demo | Demo@123 |
-| Developer | dev@vistar.demo | Demo@123 |
-| Client | client@vistar.demo | Demo@123 |
-| Temp | guest@vistar.demo | Demo@123 (expires in 7 days) |
+| Admin | admin@pharmatool.demo | Demo@123 |
+| Developer | dev@pharmatool.demo | Demo@123 |
+| Client | client@pharmatool.demo | Demo@123 |
+| Temp | guest@pharmatool.demo | Demo@123 (expires in 7 days) |
 
-Also add one expired temp user (`expired@vistar.demo`) so the expiry flow can be demonstrated.
+Also add one expired temp user (`expired@pharmatool.demo`) so the expiry flow can be demonstrated.
 
 ---
 
@@ -249,11 +178,11 @@ Also add one expired temp user (`expired@vistar.demo`) so the expiry flow can be
 **`AppLayout`** = Sidebar + Topbar + `<Outlet />`.
 
 **Sidebar** (menu items filtered by role from `config/menu.ts`):
-1. Summarize
-2. Ingredient DB
-3. HUNT
-4. RI Operations (expandable: Impact Assessment, Watchlist, Projects, Documents)
-5. Summarize Dashboard
+1. Summaries
+2. Dietary Supplements
+3. Documents
+4. Operations (expandable: Impact Assessment, Watchlist, Projects, Project Documents)
+5. Summaries Dashboard
 6. Document Upload
 7. Country Updates
 8. CMC Dashboard
@@ -269,7 +198,7 @@ Also add one expired temp user (`expired@vistar.demo`) so the expiry flow can be
 
 ## 9. Pages and Requirements
 
-### 9.1 Summarize (`/summarize`)
+### 9.1 Summaries (`/summaries`)
 Per the sitemap: Search, Compare.
 - **Filters:** Industry, Business Area, Country (multi-select dropdowns) plus a keyword box.
 - **Industry options:** Pharmaceuticals, Biotech, Medical Devices, Cosmetics, Nutraceuticals, Food Supplements.
@@ -278,16 +207,16 @@ Per the sitemap: Search, Compare.
 - **Compare:** select up to 3 results with checkboxes, then click **Compare** to open `CompareDialog` with a side-by-side table.
 - Empty state: "No results match your filters."
 
-### 9.2 Ingredient DB (`/ingredients`)
+### 9.2 Dietary Supplements (`/dietary-supplements`)
 Per the sitemap: Search, Compare, Reports.
-- **Search box:** ingredient name (debounced 400ms). Also match synonyms and CAS number in mock logic.
-- **Filters:** Type (Active API, Excipient, Preservative, Colorant, Flavour), Country.
-- **Table columns:** Name, CAS Number, Type, Country, Status (Approved / Restricted / Banned / Under Review), Last Updated, and a row action menu.
-- **Compare:** select 2 to 3 ingredients, then open `CompareDialog` (side-by-side by country and status).
-- **Reports tab:** simple report builder. Choose ingredients and countries, then click **Generate Report**, which shows a preview table plus a **Download CSV** button (client-side generation).
+- **Search box:** supplement name (debounced 400ms). Also match synonyms and common name in mock logic.
+- **Filters:** Type (Vitamin, Mineral, Herbal / Botanical, Amino Acid, Probiotic, Fatty Acid), Country.
+- **Table columns:** Name, Common Name, Type, Country, Status (Approved / Restricted / Banned / Under Review), Last Updated, and a row action menu.
+- **Compare:** select 2 to 3 dietary supplements, then open `CompareDialog` (side-by-side by country and status).
+- **Reports tab:** simple report builder. Choose dietary supplements and countries, then click **Generate Report**, which shows a preview table plus a **Download CSV** button (client-side generation).
 - Tabs: `Search` | `Reports`.
 
-### 9.3 HUNT (`/hunt`)
+### 9.3 Documents (`/documents`)
 Per the sitemap: Filter 1 (Guidances & Regulations, Updates/News, Associations), Filter 2 (Country), result actions.
 - **Filter 1:** segmented control or tabs: `Guidances & Regulations` | `Updates / News` | `Associations`.
 - **Filter 2:** Country dropdown, plus a keyword search.
@@ -299,27 +228,27 @@ Per the sitemap: Filter 1 (Guidances & Regulations, Updates/News, Associations),
 - A "Bookmarked only" toggle in the filter bar.
 - TEMP role: hide Bookmark and Share.
 
-### 9.4 RI Operations (`/ri-operations/*`)
+### 9.4 Operations (`/operations/*`)
 Sub-pages from the sitemap:
 
-**Impact Assessment (`/ri-operations/impact-assessment`)**
+**Impact Assessment (`/operations/impact-assessment`)**
 - Table of assessments: Title, Regulation, Country, Impact Level (High / Medium / Low chip), Owner, Due Date, Status.
 - "New Assessment" button opens a form dialog (title, regulation, country, impact level, owner, due date, notes). Saving adds a row in the mock store.
 
-**Watchlist (`/ri-operations/watchlist`)**
+**Watchlist (`/operations/watchlist`)**
 - List of watched regulations or topics with country, last change, and an "Unwatch" action.
 - "Add to watchlist" dialog with a topic and country selection.
 - Show a "New change" badge on items with recent updates.
 
-**Projects (`/ri-operations/projects`)** with three tabs:
+**Projects (`/operations/projects`)** with three tabs:
 - **Dashboard:** summary cards (Active Projects, Open Tasks, Overdue Tasks, Completed) plus a Recharts bar chart (tasks by status) and a donut chart (projects by country).
 - **Projects:** table with Name, Owner, Country, Status, Progress bar, Due Date. "New Project" dialog.
 - **Tasks:** table or Kanban-style list (To Do / In Progress / Done) with assignee and due date, and a "New Task" dialog.
 
-**Documents (`/ri-operations/documents`)**
+**Project Documents (`/operations/documents`)**
 - Table of project-related documents (name, type, project, uploaded by, date) with a Download action and a search box.
 
-### 9.5 Summarize Dashboard (`/summarize-dashboard`)
+### 9.5 Summaries Dashboard (`/summaries-dashboard`)
 Per the sitemap: Filters, table of all records, and per-record actions View, View Activity, Review.
 - **Filters:** Country, Category, Status (Pending / In Review / Reviewed), Date range, keyword.
 - **Table (all records, paginated):** ID, Title, Category, Country, Status chip, Reviewer, Last Updated, Actions.
@@ -389,9 +318,9 @@ export interface User {
   organisation?: string; validUntil?: string | null; enabled: boolean;
 }
 
-export interface Ingredient {
-  id: string; name: string; synonyms: string[]; casNumber: string;
-  type: 'Active API' | 'Excipient' | 'Preservative' | 'Colorant' | 'Flavour';
+export interface DietarySupplement {
+  id: string; name: string; synonyms: string[]; commonName: string;
+  type: 'Vitamin' | 'Mineral' | 'Herbal / Botanical' | 'Amino Acid' | 'Probiotic' | 'Fatty Acid';
   country: string;
   status: 'Approved' | 'Restricted' | 'Banned' | 'Under Review';
   description?: string; lastUpdated: string;
@@ -439,7 +368,7 @@ export interface Task {
 export interface PagedResponse<T> {
   content: T[]; page: number; size: number; totalElements: number; totalPages: number;
 }
-```
+````
 
 ---
 
@@ -447,28 +376,28 @@ export interface PagedResponse<T> {
 
 Base URL: `${VITE_API_URL}` (for example `/api/v1`). All list endpoints are paginated with `page` and `size` query params and return `PagedResponse<T>`. Errors return `{ status, message, timestamp }`.
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/auth/login` | Returns `{ token, user }` |
-| POST | `/auth/logout` | Invalidate session |
-| GET | `/ingredients?q=&type=&country=` | Search ingredients |
-| GET | `/ingredients/compare?ids=` | Compare ingredients |
-| POST | `/reports/ingredients` | Generate report data |
-| GET | `/regulatory-items?category=&country=&industry=&businessArea=&q=` | Summarize and HUNT search |
-| GET | `/regulatory-items/{id}` | Record details |
-| POST | `/regulatory-items/{id}/bookmark` | Toggle bookmark |
-| POST | `/regulatory-items/{id}/review` | Body: `{ decision, comment }` |
-| GET | `/regulatory-items/{id}/activity` | Audit timeline for a record |
-| GET | `/regulatory-items/{id}/download` | Download file |
-| POST | `/documents` | Multipart upload with metadata |
-| GET | `/documents` | List documents |
-| GET | `/country-updates?country=&type=&from=&to=` | Country updates |
-| PATCH | `/country-updates/{id}/read` | Mark as read |
-| GET/POST | `/projects`, `/projects/{id}/tasks`, `/tasks` | Projects and tasks |
-| GET/POST | `/watchlist` | Watchlist items |
-| GET/POST | `/impact-assessments` | Assessments |
-| GET/POST/PATCH | `/admin/users` | User management |
-| GET | `/admin/audit` | Audit log |
+| Method         | Endpoint                                                          | Purpose                        |
+| -------------- | ----------------------------------------------------------------- | ------------------------------ |
+| POST           | `/auth/login`                                                     | Returns `{ token, user }`      |
+| POST           | `/auth/logout`                                                    | Invalidate session             |
+| GET            | `/dietary-supplements?q=&type=&country=`                          | Search dietary supplements     |
+| GET            | `/dietary-supplements/compare?ids=`                               | Compare dietary supplements    |
+| POST           | `/reports/dietary-supplements`                                    | Generate report data           |
+| GET            | `/regulatory-items?category=&country=&industry=&businessArea=&q=` | Summaries and Documents search |
+| GET            | `/regulatory-items/{id}`                                          | Record details                 |
+| POST           | `/regulatory-items/{id}/bookmark`                                 | Toggle bookmark                |
+| POST           | `/regulatory-items/{id}/review`                                   | Body: `{ decision, comment }`  |
+| GET            | `/regulatory-items/{id}/activity`                                 | Audit timeline for a record    |
+| GET            | `/regulatory-items/{id}/download`                                 | Download file                  |
+| POST           | `/documents`                                                      | Multipart upload with metadata |
+| GET            | `/documents`                                                      | List documents                 |
+| GET            | `/country-updates?country=&type=&from=&to=`                       | Country updates                |
+| PATCH          | `/country-updates/{id}/read`                                      | Mark as read                   |
+| GET/POST       | `/projects`, `/projects/{id}/tasks`, `/tasks`                     | Projects and tasks             |
+| GET/POST       | `/watchlist`                                                      | Watchlist items                |
+| GET/POST       | `/impact-assessments`                                             | Assessments                    |
+| GET/POST/PATCH | `/admin/users`                                                    | User management                |
+| GET            | `/admin/audit`                                                    | Audit log                      |
 
 Each `src/api/*.ts` function must map directly onto one of these endpoints so the swap to the real backend is simple.
 
@@ -476,7 +405,7 @@ Each `src/api/*.ts` function must map directly onto one of these endpoints so th
 
 ## 13. Mock Data Requirements
 
-- **Ingredients:** about 50 realistic entries (Paracetamol, Ibuprofen, Lactose Monohydrate, Magnesium Stearate, Microcrystalline Cellulose, Titanium Dioxide, Methylparaben, Povidone, and so on) across countries: **United States, European Union, India, United Kingdom, Japan, Canada, Australia, Brazil**.
+- **Dietary supplements:** about 50 realistic entries, including Vitamin D3, Vitamin C, Omega-3 Fish Oil, Magnesium Citrate, Zinc, Ashwagandha, Ginkgo Biloba, Turmeric / Curcumin, Melatonin, Probiotic Lactobacillus, and Creatine, across **United States, European Union, India, United Kingdom, Japan, Canada, Australia, and Brazil**.
 - **Regulatory items:** about 80 entries covering all four categories, with realistic regulators (**FDA, EMA, CDSCO, MHRA, PMDA, Health Canada, TGA, ANVISA**) and dates within the last 18 months.
 - **Country updates:** about 40 entries spread across the countries above.
 - **Projects and tasks:** 8 projects and about 30 tasks.
@@ -488,30 +417,31 @@ Each `src/api/*.ts` function must map directly onto one of these endpoints so th
 
 ## 14. Build Order (follow in sequence, test after each step)
 
-1. **Project setup:** Vite, dependencies, folder structure, theme, env files, ESLint/Prettier. *App runs.*
-2. **Types, mock data and mock API layer** (`types`, `mocks`, `api`). *Console-test a few calls.*
-3. **Auth:** `AuthContext`, login page, interceptors, `ProtectedRoute`, `RoleGuard`, idle timeout. *Log in as each role.*
-4. **Layout:** sidebar, topbar, `PageHeader`, `PrototypeBanner`, role-based menu. *Each role sees the right menu.*
+1. **Project setup:** Vite, dependencies, folder structure, theme, env files, ESLint/Prettier. _App runs._
+2. **Types, mock data and mock API layer** (`types`, `mocks`, `api`). _Console-test a few calls._
+3. **Auth:** `AuthContext`, login page, interceptors, `ProtectedRoute`, `RoleGuard`, idle timeout. _Log in as each role._
+4. **Layout:** sidebar, topbar, `PageHeader`, `PrototypeBanner`, role-based menu. _Each role sees the right menu._
 5. **Shared components:** `FilterBar`, `DataTable`, `StatusChip`, `ResultActions`, `CompareDialog`, state components, toast.
-6. **Ingredient DB** (search, filters, compare, reports).
-7. **HUNT** (filters, actions).
-8. **Summarize Dashboard** (table, View, View Activity, Review).
+6. **Dietary Supplements** (search, filters, compare, reports).
+7. **Documents** (filters, actions).
+8. **Summaries Dashboard** (table, View, View Activity, Review).
 9. **Document Upload.**
-10. **Summarize** (reuse components from steps 5 to 8).
+10. **Summaries** (reuse components from steps 5 to 8).
 11. **Country Updates.**
-12. **RI Operations** (Impact Assessment, Watchlist, Projects, Documents).
+12. **Operations** (Impact Assessment, Watchlist, Projects, Documents).
 13. **CMC Dashboard** (placeholder).
 14. **Admin pages** (User Management, Audit Log).
 15. **Polish:** responsive check, empty and error states, 404/403 pages, README.
 16. **Deploy to Vercel** (Section 16).
 
-> If time runs short, cut in this order: Reports tab, Compare in Summarize, Impact Assessment, CMC details. **Never cut:** login and roles, layout and navigation, Ingredient DB, HUNT, Summarize Dashboard, deployment.
+> If time runs short, cut in this order: Reports tab, Compare in Summaries, Impact Assessment, CMC details. **Never cut:** login and roles, layout and navigation, Dietary Supplements, Documents, Summaries Dashboard, deployment.
 
 ---
 
 ## 15. Quality and Security Requirements (Frontend)
 
 **UX and quality**
+
 - Every data view needs **loading, empty and error states**.
 - Forms validate on submit and on blur, with clear messages.
 - All icon-only buttons have tooltips and `aria-label`s. Support keyboard navigation and visible focus states. Aim for WCAG AA colour contrast.
@@ -520,6 +450,7 @@ Each `src/api/*.ts` function must map directly onto one of these endpoints so th
 - Debounce search inputs. Use TanStack Query caching to avoid repeated calls.
 
 **Security**
+
 - Never use `dangerouslySetInnerHTML`. React escapes output by default, so keep it that way.
 - Validate all user input with Zod, and validate the file type and size on upload (the backend must re-validate).
 - Don't store sensitive data in `localStorage`. Use in-memory plus `sessionStorage` for the prototype token only.
@@ -534,6 +465,7 @@ Each `src/api/*.ts` function must map directly onto one of these endpoints so th
 ## 16. Deployment (Vercel)
 
 `vercel.json` (SPA routing plus security headers):
+
 ```json
 {
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
@@ -552,6 +484,7 @@ Each `src/api/*.ts` function must map directly onto one of these endpoints so th
 ```
 
 **Steps**
+
 1. Push `tool-frontend` to GitHub.
 2. Import the repo in Vercel (framework preset: **Vite**, build `npm run build`, output `dist`).
 3. Set environment variables: `VITE_USE_MOCK=true` for the first deploy, and later `VITE_USE_MOCK=false` and `VITE_API_URL=https://<backend-url>/api/v1` once the backend is live.
@@ -562,7 +495,8 @@ Each `src/api/*.ts` function must map directly onto one of these endpoints so th
 ## 17. `.github/copilot-instructions.md` (create this file first)
 
 ```markdown
-# Project: Vistar regulatory tool, frontend prototype
+# Project: Pharma Tool regulatory tool, frontend prototype
+
 - Stack: React 18, Vite, TypeScript (strict), MUI, React Router v6, TanStack Query, Axios, React Hook Form + Zod, Recharts
 - Follow FRONTEND_SPEC.md in the project root as the source of truth
 - All data access goes through src/api/*.ts. Each function returns mock data when VITE_USE_MOCK=true, otherwise calls the real API with the same signature
@@ -577,14 +511,14 @@ Each `src/api/*.ts` function must map directly onto one of these endpoints so th
 
 ## 18. Suggested Copilot Prompts (use one per build step)
 
-1. *"Following FRONTEND_SPEC.md sections 2 to 5, set up the Vite React TypeScript project with MUI theme, folder structure, env files, ESLint and Prettier."*
-2. *"Create src/types/index.ts from section 11, then create the mock data files and the mock API layer from sections 12 and 13, with latency, filtering and pagination."*
-3. *"Implement authentication from section 7: AuthContext, LoginPage, Axios interceptors, ProtectedRoute, RoleGuard, idle timeout, and the demo accounts."*
-4. *"Build AppLayout, Sidebar, Topbar and PrototypeBanner from section 8, with menu items driven by config/menu.ts and the role matrix in section 6."*
-5. *"Create the shared components in section 10."*
-6. *"Build the Ingredient DB page from section 9.2 using the shared components."*
-7. *(Repeat for 9.3 to 9.10, one page per prompt.)*
-8. *"Review the project against sections 15 and 16, fix any issues, and write the README with setup and demo credentials."*
+1. _"Following FRONTEND_SPEC.md sections 2 to 5, set up the Vite React TypeScript project with MUI theme, folder structure, env files, ESLint and Prettier."_
+2. _"Create src/types/index.ts from section 11, then create the mock data files and the mock API layer from sections 12 and 13, with latency, filtering and pagination."_
+3. _"Implement authentication from section 7: AuthContext, LoginPage, Axios interceptors, ProtectedRoute, RoleGuard, idle timeout, and the demo accounts."_
+4. _"Build AppLayout, Sidebar, Topbar and PrototypeBanner from section 8, with menu items driven by config/menu.ts and the role matrix in section 6."_
+5. _"Create the shared components in section 10."_
+6. _"Build the Dietary Supplements page from section 9.2 using the shared components."_
+7. _(Repeat for 9.3 to 9.10, one page per prompt.)_
+8. _"Review the project against sections 15 and 16, fix any issues, and write the README with setup and demo credentials."_
 
 ---
 
@@ -592,7 +526,7 @@ Each `src/api/*.ts` function must map directly onto one of these endpoints so th
 
 - [ ] All four roles log in and see the correct menu, and the expired temp user is blocked
 - [ ] Every sitemap item has a working or placeholder page
-- [ ] Ingredient DB, HUNT, Summarize Dashboard and Document Upload work end to end on mock data
+- [ ] Dietary Supplements, Documents, Summaries Dashboard and Document Upload work end to end on mock data
 - [ ] Download, Bookmark, Share, View, View Activity and Review all behave as described
 - [ ] Loading, empty and error states are present everywhere
 - [ ] Responsive on desktop and mobile widths

@@ -1,76 +1,66 @@
-# React + TypeScript + Vite
+# Pharma Tool Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 18, TypeScript, Vite, and MUI regulatory intelligence prototype. Data is served from the in-memory mock store by default; no backend is required.
 
-Currently, two official plugins are available:
+## Requirements
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 22.13+ (or Node 20.19+)
+- npm
 
-## React Compiler
+## Run locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```powershell
+npm install
+Copy-Item .env.example .env.development
+npm run dev
+```
 
-## Expanding the ESLint configuration
+Run the automated checks with:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```powershell
+npm test
+npm run lint
+npm run build
+```
 
-```js
-export default defineConfig([
-  # Vistar Frontend Prototype
+## Environment variables
 
-  React 18, TypeScript, Vite, and MUI regulatory intelligence prototype. By default, all data is served from the in-memory mock store; no backend is required.
+| Variable        | Default                        | Purpose                                                   |
+| --------------- | ------------------------------ | --------------------------------------------------------- |
+| `VITE_API_URL`  | `http://localhost:8080/api/v1` | Spring Boot API base URL                                  |
+| `VITE_USE_MOCK` | `true`                         | Use mock services when true; call API services when false |
+| `VITE_APP_NAME` | `Pharma Tool`                  | Application display name                                  |
 
-  ## Requirements
+Variables prefixed with `VITE_` are public in the browser. Do not put secrets in them. Only `.env.example` should be committed.
 
-  - Node.js 22.13+ (or Node 20.19+)
-  - npm
+## Demo accounts
 
-  ## Run locally
+Password for all accounts: `Demo@123`
 
-  ```powershell
-  npm install
-  Copy-Item .env.example .env.development
-  npm run dev
-  ```
+| Role                                              | Email                     |
+| ------------------------------------------------- | ------------------------- |
+| Admin                                             | `admin@pharmatool.demo`   |
+| Developer                                         | `dev@pharmatool.demo`     |
+| Client                                            | `client@pharmatool.demo`  |
+| Temporary (expires in 7 days)                     | `guest@pharmatool.demo`   |
+| Expired temporary (demonstrates expiry rejection) | `expired@pharmatool.demo` |
 
-  Run the automated checks with:
+## Main sections
 
-  ```powershell
-  npm test
-  npm run lint
-  npm run build
-  ```
+- Summaries: `/summaries`
+- Dietary Supplements: `/dietary-supplements`
+- Documents: `/documents`
+- Operations: `/operations/*`
+- Summaries Dashboard: `/summaries-dashboard`
+- Document Upload: `/document-upload`
 
-  ## Environment variables
+## Deployment
 
-  | Variable | Default | Purpose |
-  |---|---|---|
-  | `VITE_API_URL` | `http://localhost:8080/api/v1` | Spring Boot API base URL |
-  | `VITE_USE_MOCK` | `true` | Use mock services when true; use Axios API services when false |
-  | `VITE_APP_NAME` | `Vistar` | Application name shown in the interface |
+The repository includes `vercel.json` for SPA rewrites and security headers. In Vercel, select the Vite preset, run `npm run build`, and publish `dist`. Use `VITE_USE_MOCK=true` for the prototype. Set it to `false` and provide the deployed API URL once the backend is available.
 
-  Variables prefixed with `VITE_` are public in the browser. Do not put secrets in them. Only `.env.example` should be committed.
+## Prototype notes
 
-  ## Demo accounts
-
-  Password for all accounts: `Demo@123`
-
-  | Role | Email |
-  |---|---|
-  | Admin | `admin@vistar.demo` |
-  | Developer | `dev@vistar.demo` |
-  | Client | `client@vistar.demo` |
-  | Temporary (expires in 7 days) | `guest@vistar.demo` |
-  | Expired temporary (demonstrates expiry rejection) | `expired@vistar.demo` |
-
-  ## Deployment
-
-  The repository includes `vercel.json` for SPA rewrites and the required security headers. In Vercel, select the Vite preset, run `npm run build`, and publish `dist`. Configure `VITE_USE_MOCK=true` for the prototype. Set it to `false` and provide the deployed API URL once the Spring Boot backend is available.
-
-  ## Prototype notes
-
-  - Mock records reset on page reload; the prototype session is kept in `sessionStorage`.
-  - Frontend permission checks are for user experience only. The backend must independently enforce authorization.
-  - Production authentication should use secure `httpOnly` cookies instead of browser-accessible token storage.
-  - Regulatory mock records are illustrative; consult regulator publications for authoritative information.
+- Mock records reset on page reload; the prototype session is kept in `sessionStorage`.
+- Frontend permission checks are for user experience only. The backend must independently enforce authorization.
+- Production authentication should use secure `httpOnly` cookies instead of browser-accessible token storage.
+- Regulatory and supplement mock records are illustrative; consult authoritative sources for current requirements.

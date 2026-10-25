@@ -10,7 +10,10 @@ export async function listDocuments(): Promise<UploadedDocument[]> {
   return [...uploadedDocuments]
 }
 
-export async function uploadDocument(document: Omit<UploadedDocument, 'id' | 'uploadedAt'>, file?: File): Promise<UploadedDocument> {
+export async function uploadDocument(
+  document: Omit<UploadedDocument, 'id' | 'uploadedAt'>,
+  file?: File,
+): Promise<UploadedDocument> {
   if (!env.useMock) {
     const formData = new FormData()
     formData.append('metadata', new Blob([JSON.stringify(document)], { type: 'application/json' }))

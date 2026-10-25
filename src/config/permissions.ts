@@ -1,8 +1,15 @@
 import type { Role } from '../types'
 
 export type Permission =
-  | 'record:review' | 'document:upload' | 'project:manage' | 'watchlist:manage'
-  | 'country-update:manage' | 'admin:users' | 'admin:audit' | 'result:bookmark' | 'result:share'
+  | 'record:review'
+  | 'document:upload'
+  | 'project:manage'
+  | 'watchlist:manage'
+  | 'country-update:manage'
+  | 'admin:users'
+  | 'admin:audit'
+  | 'result:bookmark'
+  | 'result:share'
 
 const permissionMap: Record<Permission, Role[]> = {
   'record:review': ['ADMIN', 'DEVELOPER', 'CLIENT'],

@@ -5,10 +5,15 @@ import { z } from 'zod'
 import { env } from '../config/env'
 import { useAuth } from '../auth/useAuth'
 
-const loginSchema = z.object({ email: z.string().email('Enter a valid email address.'), password: z.string().min(1, 'Password is required.') })
+const loginSchema = z.object({
+  email: z.string().email('Enter a valid email address.'),
+  password: z.string().min(1, 'Password is required.'),
+})
 const demoAccounts = [
-  ['Admin', 'admin@vistar.demo'], ['Developer', 'dev@vistar.demo'],
-  ['Client', 'client@vistar.demo'], ['Temporary', 'guest@vistar.demo'],
+  ['Admin', 'admin@pharmatool.demo'],
+  ['Developer', 'dev@pharmatool.demo'],
+  ['Client', 'client@pharmatool.demo'],
+  ['Temporary', 'guest@pharmatool.demo'],
 ]
 
 export function LoginPage() {
@@ -31,7 +36,7 @@ export function LoginPage() {
     setLoading(true)
     try {
       await login(parsed.data.email, parsed.data.password)
-      const from = (location.state as { from?: Location } | null)?.from?.pathname ?? '/summarize'
+      const from = (location.state as { from?: Location } | null)?.from?.pathname ?? '/summaries'
       navigate(from, { replace: true })
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'Unable to sign in.')
@@ -41,31 +46,65 @@ export function LoginPage() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center', py: 4 }}>
+    <Container
+      maxWidth="sm"
+      sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center', py: 4 }}
+    >
       <Paper sx={{ width: '100%', p: { xs: 3, sm: 5 } }}>
         <Stack spacing={3}>
           <Box>
-            <Typography variant="h4" component="h1" fontWeight={700}>{env.appName}</Typography>
+            <Typography variant="h4" component="h1" fontWeight={700}>
+              {env.appName}
+            </Typography>
             <Typography color="text.secondary">Regulatory intelligence workspace</Typography>
           </Box>
           {error && <Alert severity="error">{error}</Alert>}
           <Box component="form" onSubmit={submit} noValidate>
             <Stack spacing={2}>
-              <TextField label="Email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="username" required />
-              <TextField label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required />
-              <Button type="submit" variant="contained" disabled={loading}>{loading ? 'Signing in…' : 'Sign in'}</Button>
+              <TextField
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="username"
+                required
+              />
+              <TextField
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="current-password"
+                required
+              />
+              <Button type="submit" variant="contained" disabled={loading}>
+                {loading ? 'Signing in…' : 'Sign in'}
+              </Button>
             </Stack>
           </Box>
           {env.useMock && (
             <Box>
-              <Typography variant="subtitle2" gutterBottom>Use demo account</Typography>
+              <Typography variant="subtitle2" gutterBottom>
+                Use demo account
+              </Typography>
               <Stack spacing={0.5}>
                 {demoAccounts.map(([role, accountEmail]) => (
-                  <Button key={role} size="small" variant="text" sx={{ justifyContent: 'flex-start' }} onClick={() => { setEmail(accountEmail!); setPassword('Demo@123') }}>
+                  <Button
+                    key={role}
+                    size="small"
+                    variant="text"
+                    sx={{ justifyContent: 'flex-start' }}
+                    onClick={() => {
+                      setEmail(accountEmail!)
+                      setPassword('Demo@123')
+                    }}
+                  >
                     {role}: {accountEmail}
                   </Button>
                 ))}
-                <Typography variant="caption" color="text.secondary">Password: Demo@123</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Password: Demo@123
+                </Typography>
               </Stack>
             </Box>
           )}

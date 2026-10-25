@@ -10,12 +10,12 @@ export interface User {
   enabled: boolean
 }
 
-export interface Ingredient {
+export interface DietarySupplement {
   id: string
   name: string
   synonyms: string[]
-  casNumber: string
-  type: 'Active API' | 'Excipient' | 'Preservative' | 'Colorant' | 'Flavour'
+  commonName: string
+  type: 'Vitamin' | 'Mineral' | 'Herbal / Botanical' | 'Amino Acid' | 'Probiotic' | 'Fatty Acid'
   country: string
   status: 'Approved' | 'Restricted' | 'Banned' | 'Under Review'
   description?: string
@@ -116,7 +116,7 @@ export interface ListParams {
   businessArea?: string
 }
 
-export interface IngredientFilters extends ListParams {
+export interface DietarySupplementFilters extends ListParams {
   ids?: string[]
 }
 

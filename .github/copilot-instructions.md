@@ -1,4 +1,5 @@
-# Project: Vistar regulatory tool, frontend prototype
+# Project: Pharma Tool regulatory tool, frontend prototype
+
 - Stack: React 18, Vite, TypeScript (strict), MUI, React Router v6, TanStack Query, Axios, React Hook Form + Zod, Recharts
 - Follow FRONTEND_SPEC.md in the project root as the source of truth
 - All data access goes through src/api/*.ts. Each function returns mock data when VITE_USE_MOCK=true, otherwise calls the real API with the same signature

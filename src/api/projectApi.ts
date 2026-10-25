@@ -16,7 +16,8 @@ export async function createProject(project: Omit<Project, 'id'>): Promise<Proje
   return saved
 }
 export async function listTasks(projectId?: string): Promise<Task[]> {
-  if (!env.useMock) return (await apiClient.get<Task[]>(projectId ? `/projects/${projectId}/tasks` : '/tasks')).data
+  if (!env.useMock)
+    return (await apiClient.get<Task[]>(projectId ? `/projects/${projectId}/tasks` : '/tasks')).data
   await delay()
   return tasks.filter((task) => !projectId || task.projectId === projectId)
 }
@@ -31,8 +32,11 @@ export async function listImpactAssessments(): Promise<ImpactAssessment[]> {
   await delay()
   return [...impactAssessments]
 }
-export async function createImpactAssessment(value: Omit<ImpactAssessment, 'id'>): Promise<ImpactAssessment> {
-  if (!env.useMock) return (await apiClient.post<ImpactAssessment>('/impact-assessments', value)).data
+export async function createImpactAssessment(
+  value: Omit<ImpactAssessment, 'id'>,
+): Promise<ImpactAssessment> {
+  if (!env.useMock)
+    return (await apiClient.post<ImpactAssessment>('/impact-assessments', value)).data
   const saved = { ...value, id: `IA-${Date.now()}` }
   impactAssessments.unshift(saved)
   return saved
@@ -42,14 +46,24 @@ export async function listWatchlist(): Promise<WatchlistItem[]> {
   await delay()
   return [...watchlist]
 }
-export async function addWatchlistItem(value: Omit<WatchlistItem, 'id' | 'lastChange' | 'newChange'>): Promise<WatchlistItem> {
+export async function addWatchlistItem(
+  value: Omit<WatchlistItem, 'id' | 'lastChange' | 'newChange'>,
+): Promise<WatchlistItem> {
   if (!env.useMock) return (await apiClient.post<WatchlistItem>('/watchlist', value)).data
-  const saved = { ...value, id: `WATCH-${Date.now()}`, lastChange: new Date().toISOString(), newChange: true }
+  const saved = {
+    ...value,
+    id: `WATCH-${Date.now()}`,
+    lastChange: new Date().toISOString(),
+    newChange: true,
+  }
   watchlist.unshift(saved)
   return saved
 }
 export async function removeWatchlistItem(id: string): Promise<void> {
-  if (!env.useMock) { await apiClient.delete(`/watchlist/${id}`); return }
+  if (!env.useMock) {
+    await apiClient.delete(`/watchlist/${id}`)
+    return
+  }
   await delay()
   const index = watchlist.findIndex((item) => item.id === id)
   if (index >= 0) watchlist.splice(index, 1)
